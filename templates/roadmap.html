@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 Roadmap Assistant</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background: #ffae62;
+      color: #000;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+    }
+
+    #chat-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      margin-top: 70px;
+      margin-bottom: 0;
+      overflow-y: auto;
+    }
+
+    #chat {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border: 2px solid #acacac;
+      margin-bottom: 2cm;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border-radius: 18px;
+      line-height: 1.5;
+      font-size: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #0084ff;
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #e5e5ea;
+      color: black;
+      border-bottom-left-radius: 5px;
+    }
+
+    #input-area {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+    }
+
+    #input-box {
+      display: flex;
+      width: 100%;
+      max-width: 800px;
+      background: #ebedf0;
+      border-radius: 25px;
+      padding: 8px 11px;
+      border: 1px solid #a3a3a3;
+    }
+
+    #userInput {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 10px;
+      font-size: 15px;
+      background: transparent;
+      resize: none;
+    }
+
+    button {
+      border: none;
+      background: #fd8a2c;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 20px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #ff7f10;
+    }
+
+    #placeholder {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+      margin-top: 40%;
+    }
+
+    .typing {
+      display: inline-block;
+      margin: 5px 0;
+    }
+
+    .typing span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin: 0 2px;
+      background: #555;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(1) { animation-delay: 0s; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    @media screen and (max-width: 768px) {
+      #chat { padding: 10px; max-width: 95%; }
+      #input-box { max-width: 95%; }
+      header { font-size: 18px; }
+    }
+
+    @media screen and (max-width: 480px) {
+      #chat { padding: 8px; }
+      .message { font-size: 14px; max-width: 90%; }
+      #input-box { padding: 6px 8px; }
+      #userInput { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  
+  <header>
+  <a href="{{ url_for('home') }}" style="
+  color: black;
+  text-decoration: none;
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+">&#8656;Home</a>
+
+  📚 Roadmap Assistant
+</header>
+
+  <div id="chat-container">
+    <div id="chat">
+      <div id="placeholder">💬 Your answers will appear here...</div>
+    </div>
+  </div>
+
+  <div id="input-area">
+    <div id="input-box">
+      <textarea id="userInput" rows="1" placeholder="Type your message..."></textarea>
+      <button type="button" id="voice-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
+        <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5"/>
+         <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3"/>
+            </svg></button>
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const MIN_TYPING_MS = 2500; // 2.5 seconds
+
+    async function sendMessage() {
+      const inputBox = document.getElementById("userInput");
+      const chat = document.getElementById("chat");
+      const userInput = inputBox.value.trim();
+      if (!userInput) return;
+
+      const placeholder = document.getElementById("placeholder");
+      if (placeholder) placeholder.remove();
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "message user";
+      userMsg.innerText = userInput;
+      chat.appendChild(userMsg);
+      inputBox.value = "";
+
+      const botMsg = document.createElement("div");
+      botMsg.className = "message bot";
+      botMsg.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+      chat.appendChild(botMsg);
+
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const startTime = Date.now();
+
+        // Fetch response from server
+        const res = await fetch("/api/roadmap", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userInput })
+        });
+        const data = await res.json();
+
+        // Ensure at least MIN_TYPING_MS has passed
+        const elapsed = Date.now() - startTime;
+        if (elapsed < MIN_TYPING_MS) {
+          await new Promise(r => setTimeout(r, MIN_TYPING_MS - elapsed));
+        }
+
+        botMsg.innerText = data.reply || "⚠ No response.";
+      } catch (err) {
+        botMsg.innerText = "❌ Error connecting to server.";
+        console.error(err);
+      }
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputBox = document.getElementById("userInput");
+      inputBox.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    });
+// 🎤 Voice recognition setup
+const voiceBtn = document.getElementById("voice-btn");
+const inputBox = document.getElementById("userInput");
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = false; // stop after one sentence
+
+  let listening = false;
+
+  voiceBtn.addEventListener('click', () => {
+    if (!listening) {
+      console.log("🎤 Starting recognition...");
+      recognition.start();
+      voiceBtn.style.background = '#ff4d4d'; // 🔴 active listening
+      listening = true;
+    } else {
+      console.log("🛑 Stopping recognition...");
+      recognition.stop();
+    }
+  });
+
+  recognition.addEventListener('result', (event) => {
+    const transcript = event.results[0][0].transcript;
+    console.log("✅ Recognized:", transcript);
+    inputBox.value = transcript;
+    sendMessage(); // auto-send after speaking
+  });
+
+  recognition.addEventListener('speechend', () => {
+    console.log("🛑 Speech ended.");
+    recognition.stop();
+  });
+
+  recognition.addEventListener('error', (event) => {
+    console.error("❌ Speech recognition error:", event.error);
+    if (event.error === "no-speech") {
+      alert("⚠️ No speech detected. Try speaking louder or check your mic.");
+    } else if (event.error === "not-allowed") {
+      alert("🚫 Mic permission denied. Please allow microphone access.");
+    } else {
+      alert("Mic error: " + event.error);
+    }
+    voiceBtn.style.background = '#fd8a2c';
+    listening = false;
+  });
+
+  recognition.addEventListener('end', () => {
+    console.log("ℹ️ Recognition ended.");
+    voiceBtn.style.background = '#fd8a2c'; // reset
+    listening = false;
+  });
+
+} else {
+  console.warn("🚫 SpeechRecognition not supported in this browser.");
+  voiceBtn.disabled = true;
+  voiceBtn.title = "Voice recognition not supported in this browser";
+}
+
+  </script>
+</body>
+</html>
